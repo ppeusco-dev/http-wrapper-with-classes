@@ -6,6 +6,7 @@ require "http/wrapper/version"
 require "http/wrapper/http_status_codes"
 require "http/wrapper/api_exceptions"
 require "http/wrapper/configuration"
+require "http/wrapper/request"
 require "http/wrapper/client"
 
 module Http
