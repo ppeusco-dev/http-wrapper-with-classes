@@ -1,63 +1,46 @@
 # frozen_string_literal: true
 
 RSpec.describe Http::Wrapper::ApiExceptions do
-  describe "exception classes" do
-    it "defines BadRequestError with correct message" do
-      error = Http::Wrapper::ApiExceptions::BadRequestError.new
-      expect(error.message).to eq("Bad Request")
-    end
-
-    it "defines UnauthorizedError with correct message" do
-      error = Http::Wrapper::ApiExceptions::UnauthorizedError.new
-      expect(error.message).to eq("Unauthorized")
-    end
-
-    it "defines ForbiddenError with correct message" do
-      error = Http::Wrapper::ApiExceptions::ForbiddenError.new
-      expect(error.message).to eq("Forbidden")
-    end
-
-    it "defines NotFoundError with correct message" do
-      error = Http::Wrapper::ApiExceptions::NotFoundError.new
-      expect(error.message).to eq("Not Found")
-    end
-
-    it "defines UnprocessableEntityError with correct message" do
-      error = Http::Wrapper::ApiExceptions::UnprocessableEntityError.new
-      expect(error.message).to eq("Unprocessable Entity")
-    end
-
-    it "defines ApiRequestsQuotaReachedError with correct message" do
-      error = Http::Wrapper::ApiExceptions::ApiRequestsQuotaReachedError.new
-      expect(error.message).to eq("API rate limit exceeded")
-    end
-
-    it "defines InternalServerError with correct message" do
-      error = Http::Wrapper::ApiExceptions::InternalServerError.new
-      expect(error.message).to eq("Internal Server Error")
-    end
-
-    it "defines BadGatewayError with correct message" do
-      error = Http::Wrapper::ApiExceptions::BadGatewayError.new
-      expect(error.message).to eq("Bad Gateway")
-    end
-
-    it "defines ServiceUnavailableError with correct message" do
-      error = Http::Wrapper::ApiExceptions::ServiceUnavailableError.new
-      expect(error.message).to eq("Service Unavailable")
-    end
-
-    it "defines GatewayTimeoutError with correct message" do
-      error = Http::Wrapper::ApiExceptions::GatewayTimeoutError.new
-      expect(error.message).to eq("Gateway Timeout")
+  shared_context "client error context" do |error_class, error_message|
+    it "is a client error with the correct message" do
+      error = error_class.new
+      expect(error.message).to eq(error_message)
     end
   end
 
-  describe "UnknownStatusError" do
-    it "has the correct message based on status" do
-      status = 404
-      error = Http::Wrapper::ApiExceptions::UnknownStatusError.new(status)
-      expect(error.message).to eq("Unknown Status: 404")
+  context "4xx Client Errors" do
+    include_context "client error context", Http::Wrapper::ApiExceptions::BadRequestError, "Bad Request"
+    include_context "client error context", Http::Wrapper::ApiExceptions::UnauthorizedError, "Unauthorized"
+    include_context "client error context", Http::Wrapper::ApiExceptions::ForbiddenError, "Forbidden"
+    include_context "client error context", Http::Wrapper::ApiExceptions::NotFoundError, "Not Found"
+    include_context "client error context", Http::Wrapper::ApiExceptions::UnprocessableEntityError,
+                    "Unprocessable Entity"
+    include_context "client error context", Http::Wrapper::ApiExceptions::ApiRequestsQuotaReachedError,
+                    "API rate limit exceeded"
+  end
+end
+
+RSpec.describe Http::Wrapper::ApiExceptions do
+  shared_context "server error context" do |error_class, error_message|
+    it "is a server error with the correct message" do
+      error = error_class.new
+      expect(error.message).to eq(error_message)
     end
+  end
+
+  context "5xx Server Errors" do
+    include_context "server error context", Http::Wrapper::ApiExceptions::InternalServerError, "Internal Server Error"
+    include_context "server error context", Http::Wrapper::ApiExceptions::BadGatewayError, "Bad Gateway"
+    include_context "server error context", Http::Wrapper::ApiExceptions::ServiceUnavailableError, "Service Unavailable"
+    include_context "server error context", Http::Wrapper::ApiExceptions::GatewayTimeoutError, "Gateway Timeout"
+  end
+end
+
+# Especificaciones adicionales
+RSpec.describe Http::Wrapper::ApiExceptions::UnknownStatusError do
+  it "has the correct message based on status" do
+    status = 404
+    error = described_class.new(status)
+    expect(error.message).to eq("Unknown Status: 404")
   end
 end
