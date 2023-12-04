@@ -1,58 +1,40 @@
 # frozen_string_literal: true
 
-require "faraday" # Asegúrate de requerir la gema Faraday
+require "faraday"
 
 module Http
   module Wrapper
-    # Configuration class provides methods for configuring Faraday connections.
+    # Configuration poro provides methods for configuring Faraday connections.
     class Configuration
-      def initialize(base_url:, api_endpoint:, headers: {}, faraday_options: {})
-        @base_url = base_url
-        @api_endpoint = api_endpoint
-        @headers = headers
-        @faraday_options = faraday_options
+      def self.connection(base_url:, api_endpoint:, headers: {}, faraday_options: {})
+        connection = ConnectionBuilder.build_faraday_connection(build_url(base_url, api_endpoint), faraday_options)
+        HeadersConfigurator.configure_faraday_headers(connection, headers)
+        connection
       end
 
-      def connection
-        @connection ||= build_faraday_connection.tap do |configured_conn|
-          configure_faraday_headers(configured_conn)
-        end
-      end
-
-      private
-
-      def build_faraday_connection
-        url = build_url
-        url_with_scheme = add_scheme_to_url(url)
-
-        Faraday.new(url_with_scheme, @faraday_options) do |conn|
-          conn.adapter Faraday.default_adapter
-        end
-      end
-
-      def configure_faraday_headers(conn)
-        headers = build_headers
-
-        headers.each do |key, value|
-          conn.headers[key.to_s] = value.to_s
-        end
-      end
-
-      def build_headers
-        @headers.each_with_object({}) { |(key, value), hash| hash[key.to_s] = value.to_s }
-      end
-
-      def build_url
-        full_url = "#{@base_url.to_s.chomp("/")}/#{@api_endpoint.to_s.sub(%r{^/}, "")}"
+      def self.build_url(base_url, api_endpoint)
+        full_url = "#{base_url.to_s.chomp("/")}/#{api_endpoint.to_s.sub(%r{^/}, "")}"
         URI.parse(full_url).tap do |uri|
           uri.scheme = "http" unless uri.scheme =~ /^https?$/
         end.to_s
       end
+    end
 
-      def add_scheme_to_url(url)
-        uri = URI.parse(url)
-        uri.scheme = "https" if uri.scheme.nil? || uri.scheme.empty?
-        uri.to_s
+    # ConnectionBuilder poro for building Faraday connections
+    class ConnectionBuilder
+      def self.build_faraday_connection(url, options)
+        Faraday.new(url, options) do |conn|
+          conn.adapter Faraday.default_adapter
+        end
+      end
+    end
+
+    # HeadersConfigurator poro for configuring Faraday headers
+    class HeadersConfigurator
+      def self.configure_faraday_headers(connection, headers)
+        headers.each do |key, value|
+          connection.headers[key.to_s] = value.to_s
+        end
       end
     end
   end
