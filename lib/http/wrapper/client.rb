@@ -1,91 +1,44 @@
 # frozen_string_literal: true
 
+require_relative "default_configuration"
+require_relative "default_request"
+require_relative "default_response"
+
 module Http
   module Wrapper
-    # Module to encapsulate HTTP client functionality for the Http::Wrapper module.
-    module Client
+    # The `Client` class provides a simple interface for making HTTP requests.
+    class Client
       include ::Http::Wrapper::ApiExceptions
       include ::Http::Wrapper::HttpStatusCodes
+      include ::Http::Wrapper::ErrorHandling
+      include ::Http::Wrapper::ErrorHandling
 
-      ERROR_MAPPING = {
-        OK => nil,
-        CREATED => nil,
-        ACCEPTED => nil,
-        NO_CONTENT => nil,
-        MOVED_PERMANENTLY => nil,
-        FOUND => nil,
-        NOT_MODIFIED => nil,
-        TEMPORARY_REDIRECT => nil,
-        PERMANENT_REDIRECT => nil,
-        BAD_REQUEST => ApiExceptions.const_get("BadRequestError").new,
-        UNAUTHORIZED => ApiExceptions.const_get("UnauthorizedError").new,
-        FORBIDDEN => ->(response) { forbidden_error(response) },
-        NOT_FOUND => ApiExceptions.const_get("NotFoundError").new,
-        UNPROCESSABLE_ENTITY => ApiExceptions.const_get("UnprocessableEntityError").new,
-        TOO_MANY_REQUESTS => ApiExceptions.const_get("ApiRequestsQuotaReachedError").new,
-        INTERNAL_SERVER_ERROR => ApiExceptions.const_get("InternalServerError").new,
-        BAD_GATEWAY => ApiExceptions.const_get("BadGatewayError").new,
-        SERVICE_UNAVAILABLE => ApiExceptions.const_get("ServiceUnavailableError").new,
-        GATEWAY_TIMEOUT => ApiExceptions.const_get("GatewayTimeoutError").new,
-        DEFAULT => ApiExceptions.const_get("ApiError").new
-      }.freeze
-
-      def connection(api_endpoint, headers)
-        @connection ||= Faraday.new(api_endpoint) do |conn|
-          conn.adapter Faraday.default_adapter
-          conn.headers = headers
-        end
+      def initialize(base_url:, api_endpoint:, headers: {},
+                     configuration: Http::Wrapper::DefaultConfiguration.new(base_url: base_url, api_endpoint: api_endpoint,
+                                                                            headers: headers),
+                     request: Http::Wrapper::DefaultRequest.new(configuration.connection),
+                     response_class: Http::Wrapper::DefaultResponse)
+        @config = configuration
+        @request = request
+        @response_class = response_class
       end
 
-      def request(connection:, http_method:, endpoint:, params_type: :query, params: {})
-        @response = send_request(connection, http_method, endpoint, params, params_type)
-        handle_response
+      def request(http_method:, endpoint:, params_type: :query, params: {})
+        debugger
+        response = @request.perform(http_method: http_method, endpoint: endpoint, params_type: params_type,
+                                    params: params)
+        handle_response(response)
       end
 
       private
 
-      def send_request(connection, http_method, endpoint, params, params_type)
-        request_methods = {
-          query: -> { connection.public_send(http_method, endpoint, params) },
-          body: -> { perform_body_request(connection, http_method, endpoint, params) }
-        }
+      def handle_response(response)
+        response_handler = @response_class.new(response)
+        parsed_response = response_handler.handle
 
-        request_method = request_methods[params_type] || (raise "Unknown params type: #{params_type}")
-        request_method.call
-      end
+        return parsed_response if response_handler.response_successful?
 
-      def perform_body_request(connection, _http_method, endpoint, params)
-        connection.get(endpoint) do |req|
-          req.headers[:content_type] = "application/json"
-          req.body = params
-          req.adapter Faraday.default_adapter
-        end
-      end
-
-      def handle_response
-        parsed_response = Oj.load(@response.body)
-
-        return parsed_response if response_successful?
-
-        raise error_class, "Code: #{@response.status}, response: #{@response.body}"
-      end
-
-      def error_class
-        ERROR_MAPPING[@response.status] || UnknownStatusError.new(@response.status)
-      end
-
-      def response_successful?
-        SUCCESSFUL_STATUS.include?(@response.status)
-      end
-
-      def api_requests_quota_reached?
-        @response.body.match?(API_REQUESTS_QUOTA_REACHED_MESSAGE)
-      end
-
-      def forbidden_error(response)
-        return ApiExceptions.const_get("ApiRequestsQuotaReachedError").new if api_requests_quota_reached?(response)
-
-        ApiExceptions.const_get("ForbiddenError").new
+        raise error_class(response), "Code: #{response.status}, response: #{response.body}"
       end
     end
   end

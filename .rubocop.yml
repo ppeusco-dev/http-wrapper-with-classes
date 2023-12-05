@@ -11,3 +11,9 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/http/wrapper/client_spec.rb'
+    - 'spec/http/wrapper/response_spec.rb'
+    - 'http-wrapper-with-classes.gemspec'
