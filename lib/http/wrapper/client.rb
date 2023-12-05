@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "configuration"
+require_relative "default_configuration"
 require_relative "request"
 require_relative "response"
 
@@ -19,7 +19,7 @@ module Http
       # @param api_endpoint [String] The API endpoint to be appended to the base URL.
       # @param headers [Hash] Additional headers to include in the HTTP requests.
       def initialize(base_url:, api_endpoint:, headers: {})
-        @config = Configuration.new(base_url: base_url, api_endpoint: api_endpoint, headers: headers)
+        @config = DefaultConfiguration.new(base_url: base_url, api_endpoint: api_endpoint, headers: headers)
       end
 
       # Sends an HTTP request to the specified endpoint.
