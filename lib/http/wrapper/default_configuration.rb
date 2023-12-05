@@ -3,8 +3,9 @@
 module Http
   module Wrapper
     # Configuration class provides methods for configuring Faraday connections.
-    class DefaultConfiguration
+    class DefaultConfiguration < Http::Wrapper::Interfaces::Configuration
       def initialize(base_url:, api_endpoint:, headers: {})
+        super()
         @base_url = base_url
         @api_endpoint = api_endpoint
         @headers = headers

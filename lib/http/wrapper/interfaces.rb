@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 module Http
   module Wrapper
     module Interfaces
       # Interface for configuration
-      module Configuration
+      class Configuration
         def connection
           raise NotImplementedError
         end
       end
 
       # Interface for request handling
-      module Request
+      class Request
         def perform(http_method:, endpoint:, params_type:, params:)
           raise NotImplementedError
         end
       end
 
       # Interface for response handling
-      module Response
+      class Response
         def handle
           raise NotImplementedError
         end

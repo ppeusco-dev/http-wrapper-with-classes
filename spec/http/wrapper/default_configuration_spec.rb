@@ -12,7 +12,7 @@ RSpec.describe Http::Wrapper::DefaultConfiguration do
                                                .and_return(headers_configurator_double)
 
       configuration = Http::Wrapper::DefaultConfiguration.new(base_url: "http://example.com", api_endpoint: "/api",
-                                                       headers: { "Content-Type" => "application/json" })
+                                                              headers: { "Content-Type" => "application/json" })
       configuration.connection(faraday_options: {})
 
       expect(Http::Wrapper::ConnectionBuilder).to have_received(:build_faraday_connection).with(

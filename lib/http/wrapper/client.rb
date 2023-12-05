@@ -13,34 +13,27 @@ module Http
       include ::Http::Wrapper::ErrorHandling
       include ::Http::Wrapper::ErrorHandling
 
-      # Initializes a new instance of the `Client` class.
-      #
-      # @param base_url [String] The base URL of the API.
-      # @param api_endpoint [String] The API endpoint to be appended to the base URL.
-      # @param headers [Hash] Additional headers to include in the HTTP requests.
-      def initialize(base_url:, api_endpoint:, headers: {})
-        @config = DefaultConfiguration.new(base_url: base_url, api_endpoint: api_endpoint, headers: headers)
+      def initialize(base_url:, api_endpoint:, headers: {},
+                     configuration: Http::Wrapper::DefaultConfiguration.new(base_url: base_url, api_endpoint: api_endpoint,
+                                                                            headers: headers),
+                     request: Http::Wrapper::DefaultRequest.new(configuration.connection),
+                     response_class: Http::Wrapper::DefaultResponse)
+        @config = configuration
+        @request = request
+        @response_class = response_class
       end
 
-      # Sends an HTTP request to the specified endpoint.
-      #
-      # @param http_method [Symbol] The HTTP method for the request (:get, :post, :put, etc.).
-      # @param endpoint [String] The API endpoint to send the request to.
-      # @param params_type [Symbol] The type of parameters (:query or :body).
-      # @param params [Hash] The parameters to include in the request.
-      # @return [Object] The parsed response from the server.
       def request(http_method:, endpoint:, params_type: :query, params: {})
-        connection = @config.connection
-        request = DefaultRequest.new(connection)
-        response = request.perform(http_method: http_method, endpoint: endpoint, params_type: params_type,
-                                   params: params)
+        debugger
+        response = @request.perform(http_method: http_method, endpoint: endpoint, params_type: params_type,
+                                    params: params)
         handle_response(response)
       end
 
       private
 
       def handle_response(response)
-        response_handler = DefaultResponse.new(response)
+        response_handler = @response_class.new(response)
         parsed_response = response_handler.handle
 
         return parsed_response if response_handler.response_successful?

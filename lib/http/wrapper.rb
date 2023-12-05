@@ -2,6 +2,7 @@
 
 require "faraday"
 
+require "http/wrapper/interfaces"
 require "http/wrapper/version"
 require "http/wrapper/http_status_codes"
 require "http/wrapper/api_exceptions"
