@@ -2,7 +2,7 @@
 
 require_relative "default_configuration"
 require_relative "default_request"
-require_relative "response"
+require_relative "default_response"
 
 module Http
   module Wrapper
@@ -40,7 +40,7 @@ module Http
       private
 
       def handle_response(response)
-        response_handler = Response.new(response)
+        response_handler = DefaultResponse.new(response)
         parsed_response = response_handler.handle
 
         return parsed_response if response_handler.response_successful?
