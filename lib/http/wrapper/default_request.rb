@@ -5,7 +5,7 @@ require "faraday"
 module Http
   module Wrapper
     # Request class provides methods for handling HTTP requests in the HTTP wrapper.
-    class Request
+    class DefaultRequest
       def initialize(connection)
         @connection = connection
       end

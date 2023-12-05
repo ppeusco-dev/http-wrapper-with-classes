@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "default_configuration"
-require_relative "request"
+require_relative "default_request"
 require_relative "response"
 
 module Http
@@ -31,7 +31,7 @@ module Http
       # @return [Object] The parsed response from the server.
       def request(http_method:, endpoint:, params_type: :query, params: {})
         connection = @config.connection
-        request = Request.new(connection)
+        request = DefaultRequest.new(connection)
         response = request.perform(http_method: http_method, endpoint: endpoint, params_type: params_type,
                                    params: params)
         handle_response(response)
