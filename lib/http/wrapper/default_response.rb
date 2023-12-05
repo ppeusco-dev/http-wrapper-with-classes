@@ -3,11 +3,12 @@
 module Http
   module Wrapper
     # Response class provides methods for handling HTTP responses in the HTTP wrapper.
-    class Response
+    class DefaultResponse < Http::Wrapper::Interfaces::Configuration
       include ::Http::Wrapper::ErrorHandling
       include ::Http::Wrapper::HttpStatusCodes
 
       def initialize(response)
+        super()
         @response = response
       end
 

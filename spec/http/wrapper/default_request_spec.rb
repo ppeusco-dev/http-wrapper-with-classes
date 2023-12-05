@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Http::Wrapper::Request do
+RSpec.describe Http::Wrapper::DefaultRequest do
   describe "#perform" do
     it "uses Faraday to make a request" do
       # Crea un doble de instancia para Faraday
@@ -10,7 +10,7 @@ RSpec.describe Http::Wrapper::Request do
       allow(faraday_double).to receive(:public_send)
 
       # Crea una instancia de tu clase Request usando el doble de instancia de Faraday
-      request = Http::Wrapper::Request.new(faraday_double)
+      request = Http::Wrapper::DefaultRequest.new(faraday_double)
 
       # Llama a #perform
       request.perform(http_method: :get, endpoint: "/example")
