@@ -10,7 +10,7 @@ module Http
         @connection = connection
       end
 
-      def perform(http_method, endpoint, params_type: :query, params: {})
+      def perform(http_method:, endpoint:, params_type: :query, params: {})
         request_methods = {
           query: -> { @connection.public_send(http_method, endpoint, params) },
           body: -> { perform_body(http_method, endpoint, params) }

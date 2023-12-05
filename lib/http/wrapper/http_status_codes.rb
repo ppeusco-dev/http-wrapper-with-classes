@@ -41,5 +41,32 @@ module Http
         SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
       ].freeze
     end
+
+    STATUS_CODE_MAP = {
+      200 => :ok,
+      201 => :created,
+      202 => :accepted,
+      204 => :no_content,
+      301 => :moved_permanently,
+      302 => :found,
+      304 => :not_modified,
+      307 => :temporary_redirect,
+      308 => :permanent_redirect,
+      400 => :bad_request,
+      401 => :unauthorized,
+      403 => :forbidden,
+      404 => :not_found,
+      405 => :method_not_allowed,
+      409 => :conflict,
+      422 => :unprocessable_entity,
+      429 => :too_many_requests,
+      500 => :internal_server_error,
+      502 => :bad_gateway,
+      503 => :service_unavailable,
+      504 => :gateway_timeout,
+      default: :unknown_status
+    }.freeze
+
+    SUCCESSFUL_STATUS_RANGE = (200..399).freeze
   end
 end
