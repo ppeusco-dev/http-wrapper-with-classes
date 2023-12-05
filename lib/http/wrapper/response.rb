@@ -4,8 +4,8 @@ module Http
   module Wrapper
     # Response class provides methods for handling HTTP responses in the HTTP wrapper.
     class Response
-      include ErrorHandling
-      include HttpStatusCodes
+      include ::Http::Wrapper::ErrorHandling
+      include ::Http::Wrapper::HttpStatusCodes
 
       def initialize(response)
         @response = response
@@ -19,10 +19,9 @@ module Http
         raise error_class, "Code: #{@response.status}, response: #{@response.body}"
       end
 
-      private
-
       def response_successful?
-        SUCCESSFUL_STATUS.include?(@response.status)
+        status_symbol = STATUS_CODE_MAP[@response.status]
+        SUCCESSFUL_STATUS.include?(status_symbol)
       end
     end
   end
