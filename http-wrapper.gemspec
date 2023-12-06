@@ -10,12 +10,12 @@ Gem::Specification.new do |spec|
 
   spec.summary = "HTTP Wrapper Gem."
   spec.description = "A Ruby gem for wrapping HTTP requests in a convenient way."
-  spec.homepage = "https://github.com/ppeusco-dev/http-wrapper.git"
+  spec.homepage = "https://github.com/ppeusco-dev/http-wrapper-with-classes.git"
   spec.license = "MIT"
 
   spec.required_ruby_version = ">= 2.6.0"
 
-  spec.metadata["allowed_push_host"] = "https://github.com/ppeusco-dev/http-wrapper.git"
+  spec.metadata["allowed_push_host"] = "https://github.com/ppeusco-dev/http-wrapper-with-classes.git"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(__dir__) do
     `git ls-files -z`.split("\x0").reject do |f|
       (File.expand_path(f) == __FILE__) ||
-        f.start_with?(*%w[bin/ test/ spec/ features/ .git .circleci appveyor Gemfile])
+        f.start_with?(*%w[bin/ test/ spec/ features/ .git .circleci appveyor Gemfile http-wrapper.gemspec])
     end
   end
   spec.bindir = "exe"

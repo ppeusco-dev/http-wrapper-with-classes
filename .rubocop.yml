@@ -16,4 +16,4 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/http/wrapper/client_spec.rb'
     - 'spec/http/wrapper/response_spec.rb'
-    - 'http-wrapper-with-classes.gemspec'
+    - 'http-wrapper.gemspec'
