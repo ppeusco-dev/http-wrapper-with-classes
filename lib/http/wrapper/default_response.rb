@@ -3,7 +3,9 @@
 module Http
   module Wrapper
     # Response class provides methods for handling HTTP responses in the HTTP wrapper.
-    class DefaultResponse < Http::Wrapper::Interfaces::Configuration
+    class DefaultResponse
+      include ::Http::Wrapper::Interfaces::Response
+
       include ::Http::Wrapper::ErrorHandling
       include ::Http::Wrapper::HttpStatusCodes
 
