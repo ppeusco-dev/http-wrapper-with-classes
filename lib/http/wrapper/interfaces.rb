@@ -4,21 +4,21 @@ module Http
   module Wrapper
     module Interfaces
       # Interface for configuration
-      class Configuration
+      module Configuration
         def connection
           raise NotImplementedError
         end
       end
 
       # Interface for request handling
-      class Request
+      module Request
         def perform(http_method:, endpoint:, params_type:, params:)
           raise NotImplementedError
         end
       end
 
       # Interface for response handling
-      class Response
+      module Response
         def handle
           raise NotImplementedError
         end
